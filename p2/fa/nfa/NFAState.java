@@ -1,6 +1,7 @@
 package fa.nfa;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.LinkedHashSet;
 
@@ -11,7 +12,7 @@ public class NFAState extends fa.State {
     private boolean isFinal;//to hold if final
 
     //Map of transitions on a character fir the given state
-    private HashMap<Character , LinkedHashSet<NFAState>> transitionMap;//based on fa.State and DFAState
+    private HashMap<Character , Set<NFAState>> transitionMap;//based on fa.State and DFAState
 
 
 
@@ -20,7 +21,7 @@ public class NFAState extends fa.State {
 */
     public NFAState(String inputName){
         this.name = inputName;
-        transitionMap = new HashMap<Character, LinkedHashSet<NFAState>>();
+        transitionMap = new HashMap<Character, Set<NFAState>>();
         isFinal = false;
     }
     /*Contrsuctor
@@ -30,7 +31,7 @@ public class NFAState extends fa.State {
     */
     public NFAState(String inputname, boolean bool){
         this.name = inputname;
-        transitionMap = new HashMap<Character, LinkedHashSet<NFAState>>();
+        transitionMap = new HashMap<Character, Set<NFAState>>();
         isFinal = bool;
     }
 
@@ -43,8 +44,13 @@ public class NFAState extends fa.State {
 	 * @param toState - state that will be transitioned to
 	 */
     //BASED ON DFA
-    public void addTransition(char onSymb, LinkedHashSet<NFAState> toState){
-        transitionMap.put(onSymb, toState);
+    public void addTransition(char onSymb, NFAState toState){
+        if(transitionMap.containsKey(onSymb) == false){
+           HashSet<NFAState> temp = new HashSet<NFAState>();
+            transitionMap.put(onSymb, temp);
+        }
+        transitionMap.get(onSymb).add(toState);
+        
     }
     /**
 	 * Method to add a transition to the DFA
@@ -53,27 +59,27 @@ public class NFAState extends fa.State {
 	 * @param toState - state that will be transitioned to
 	 */
     
-    public void addTransition(char onSymb, NFAState toState){
+    // public void addTransition(char onSymb, NFAState toState){
         
-        if(transitionMap.get(onSymb) == null){//conditon for it to be empty
-            //make single hashset
-            LinkedHashSet<NFAState> firstTrans = new LinkedHashSet<NFAState>();
+    //     if(transitionMap.get(onSymb) == null){//conditon for it to be empty
+    //         //make single hashset
+    //         LinkedHashSet<NFAState> firstTrans = new LinkedHashSet<NFAState>();
             
-            firstTrans.add(toState);
-            transitionMap.put(onSymb, firstTrans);
-        }
-        else{//conditon for it to not empty
-            //make branch linked hash
-            LinkedHashSet<NFAState> multiTrans = new LinkedHashSet<NFAState>();
-            multiTrans.add(toState);
-            transitionMap.put(onSymb, multiTrans);
-        }
-    }
+    //         firstTrans.add(toState);
+    //         transitionMap.put(onSymb, firstTrans);
+    //     }
+    //     else{//conditon for it to not empty
+    //         //make branch linked hash
+    //         LinkedHashSet<NFAState> multiTrans = new LinkedHashSet<NFAState>();
+    //         multiTrans.add(toState);
+    //         transitionMap.put(onSymb, multiTrans);
+    //     }
+    // }
     public String getNameNFA(){
         return this.name;
     }
     //returns transtion from current state given on symbol
-    public LinkedHashSet<NFAState> getTrans(char onSymb){
+    public Set<NFAState> getTrans(char onSymb){
         return transitionMap.get(onSymb);
     }
 
