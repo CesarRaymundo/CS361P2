@@ -18,7 +18,8 @@ public class NFA implements NFAInterface{
     
     public NFA(){
 		states = new LinkedHashSet<>();
-		sigma = new HashSet<>();
+		eClosure = new LinkedHashSet<>();
+        sigma = new HashSet<>();
     }
   
     @Override
