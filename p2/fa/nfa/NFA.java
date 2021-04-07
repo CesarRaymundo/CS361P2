@@ -13,11 +13,11 @@ public class NFA implements NFAInterface{
     private LinkedHashSet<NFAState> finalStates; //holds all final states
     private NFAState startState; //starting state
     private LinkedHashSet<NFAState> eClosure;// holds the states that can be transtioned with 'e'
-    private LinkedHashSet<NFAState> states; //holds all the states of the NFA	
+    private LinkedHashSet<NFAState> statesSet; //holds all the states of the NFA	
 	private HashSet<Character> sigma; //includes all letters used
     
     public NFA(){
-		states = new LinkedHashSet<>();
+		statesSet = new LinkedHashSet<>();
 		eClosure = new LinkedHashSet<>();
         sigma = new HashSet<>();
     }
@@ -27,7 +27,7 @@ public class NFA implements NFAInterface{
         NFAState s = checkIfExists(name);
         if(s == null){
             s = new NFAState(name);
-            states.add(s);
+            statesSet.add(s);
         }else{
             System.out.println("Warning: A state with name"+name+"already exists");
         }
@@ -46,7 +46,7 @@ public class NFA implements NFAInterface{
     NFAState s = checkIfExists(name);
     if(s == null){
         s = new NFAState(name);
-        states.add(s);
+        statesSet.add(s);
     }else{
         System.out.println("Warning: A state with name"+name+"already exists");
     }
@@ -60,7 +60,7 @@ public class NFA implements NFAInterface{
       if(f == null){
           f = new NFAState(name);
           finalStates.add(f);
-          states.add(f);
+          statesSet.add(f);
       }else{
         System.out.println("Warning: A state with name"+name+"already exists");
       }
@@ -74,8 +74,8 @@ public class NFA implements NFAInterface{
         if(!sigma.contains(onSymb)) {
 			sigma.add(onSymb);
 		}
-		Iterator<NFAState> toItr = states.iterator();
-		Iterator<NFAState> fromItr = states.iterator();
+		Iterator<NFAState> toItr = statesSet.iterator();
+		Iterator<NFAState> fromItr = statesSet.iterator();
 		NFAState fromS = fromItr.next();
 		while(fromItr.hasNext() 
 				&& !fromS.getNameNFA().equals(fromState)) {
@@ -185,7 +185,7 @@ public class NFA implements NFAInterface{
 //	}
     @Override
     public Set<? extends State> getStates() {
-        return states;
+        return statesSet;
     }
 
     @Override
@@ -244,7 +244,7 @@ public class NFA implements NFAInterface{
 	 */
 	private NFAState checkIfExists(String name) {
 		NFAState ret = null;
-		for (NFAState s : states) {
+		for (NFAState s : statesSet) {
 			if (s.getName().equals(name)) {
 				ret = s;
 				break;
