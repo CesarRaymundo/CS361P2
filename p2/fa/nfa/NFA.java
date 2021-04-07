@@ -10,7 +10,7 @@ import fa.dfa.DFA;
 
 public class NFA implements NFAInterface{
     
-    private NFAState finalState; //final state
+    private LinkedHashSet<NFAState> finalStates; //holds all final states
     private NFAState startState; //starting state
     private LinkedHashSet<NFAState> eClosure;// holds the states that can be transtioned with 'e'
     private LinkedHashSet<NFAState> states; //holds all the states of the NFA	
@@ -24,25 +24,48 @@ public class NFA implements NFAInterface{
   
     @Override
     public void addStartState(String name) {
-        startState = new NFAState(name);
-        if(startState != null){
-            checkState(startState);
+        NFAState s = checkIfExists(name);
+        if(s == null){
+            s = new NFAState(name);
+            states.add(s);
         }else{
-            addState(name);
+            System.out.println("Warning: A state with name"+name+"already exists");
         }
+        startState = s;
+        
+        // if(startState != null){
+        //     checkState(startState);
+        // }else{
+        //     addState(name);
+        // }
         
     }
 
     @Override
     public void addState(String name) {
-       NFAState stateToAdd = new NFAState(name);
-       checkState(stateToAdd);
+    NFAState s = checkIfExists(name);
+    if(s == null){
+        s = new NFAState(name);
+        states.add(s);
+    }else{
+        System.out.println("Warning: A state with name"+name+"already exists");
+    }
+        //    NFAState stateToAdd = new NFAState(name);
+    //    checkState(stateToAdd);
     }
 
     @Override
     public void addFinalState(String name) {
-        finalState = new NFAState(name,true);
-        checkState(finalState);
+      NFAState f = checkIfExists(name);
+      if(f == null){
+          f = new NFAState(name);
+          finalStates.add(f);
+          states.add(f);
+      }else{
+        System.out.println("Warning: A state with name"+name+"already exists");
+      }
+        // finalState = new NFAState(name,true);
+        // checkState(finalState);
         
     }
 
@@ -167,12 +190,12 @@ public class NFA implements NFAInterface{
 
     @Override
     public Set<? extends State> getFinalStates() {
-        Set<NFAState> finalStates = new HashSet<NFAState>();
-        for (NFAState x: states){
-            if (x.isFinal()){
-                finalStates.add(x);
-            }
-        }
+        // Set<NFAState> finalStates = new HashSet<NFAState>();
+        // for (NFAState x: states){
+        //     if (x.isFinal()){
+        //         finalStates.add(x);
+        //     }
+        // }
         return finalStates;
     }
 
@@ -212,17 +235,34 @@ public class NFA implements NFAInterface{
 		return this.eClosure;
     }
     
-
-    /**
-     * Checks if the state already exists.
-     * Adds the state to the list if not already added.
-     * 
-     * @param x
-     */
-    private void checkState(NFAState x){
-        if(!states.contains(x)){
-            states.add(x);
-        }
-    }
+/**
+	 * Check if a state with such name already exists
+	 * 
+     * This method is taken from DFA class provided
+	 * @param name
+	 * @return null if no state exist, or DFAState object otherwise.
+	 */
+	private NFAState checkIfExists(String name) {
+		NFAState ret = null;
+		for (NFAState s : states) {
+			if (s.getName().equals(name)) {
+				ret = s;
+				break;
+			}
+		}
+		return ret;
+	}
+	
+    // /**
+    //  * Checks if the state already exists.
+    //  * Adds the state to the list if not already added.
+    //  * 
+    //  * @param x
+    //  */
+    // private void checkState(NFAState x){
+    //     if(!states.contains(x)){
+    //         states.add(x);
+    //     }
+    // }
     
 }
