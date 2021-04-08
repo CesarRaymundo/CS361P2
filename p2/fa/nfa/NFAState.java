@@ -14,7 +14,7 @@ public class NFAState extends fa.State {
     private boolean finalBool;//to hold if final
 
     //Map of transitions on a character fir the given state
-    private HashMap<Character , Set<NFAState>> transitionMap;//based on fa.State and DFAState
+    private HashMap<Character , HashSet<NFAState>> transitionMap;//based on fa.State and DFAState
 
 
 
@@ -23,7 +23,7 @@ public class NFAState extends fa.State {
 */
     public NFAState(String inputName){
         this.name = inputName;
-        transitionMap = new HashMap<Character, Set<NFAState>>();
+        transitionMap = new HashMap<Character, HashSet<NFAState>>();
         finalBool = false;
     }
     /*Contrsuctor
@@ -33,7 +33,7 @@ public class NFAState extends fa.State {
     */
     public NFAState(String inputname, boolean bool){
         this.name = inputname;
-        transitionMap = new HashMap<Character, Set<NFAState>>();
+        transitionMap = new HashMap<Character, HashSet<NFAState>>();
         finalBool = bool;
     }
 
@@ -47,11 +47,11 @@ public class NFAState extends fa.State {
 	 */
     //BASED ON DFA
     public void addTransition(char onSymb, NFAState toState){
-        if(transitionMap.containsKey(onSymb) == false){
-           HashSet<NFAState> temp = new HashSet<NFAState>();
-            transitionMap.put(onSymb, temp);
-        }
-        transitionMap.get(onSymb).add(toState);
+       if(!transitionMap.containsKey(onSymb)){
+           transitionMap.put(onSymb, new HashSet<NFAState>());
+       }
+
+       transitionMap.get(onSymb).add(toState);
         
     }
     /**
@@ -81,8 +81,8 @@ public class NFAState extends fa.State {
         return this.name;
     }
     //returns transtion from current state given on symbol
-    public Set<NFAState> getTrans(char onSymb){
-        return transitionMap.get(onSymb);
+    public HashMap<Character , HashSet<NFAState>> getTrans(){
+        return transitionMap;
     }
     //returns transtion from current state given on symbol
     public Set<NFAState> getTransition(char onSymb){

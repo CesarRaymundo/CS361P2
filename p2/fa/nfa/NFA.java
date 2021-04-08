@@ -62,8 +62,9 @@ public class NFA implements NFAInterface{
       NFAState f = checkIfExists(name);
       if(f == null){
           f = new NFAState(name,true);
-          //finalStates.add(f);
+          finalStates.add(f);
           statesSet.add(f);
+
       }else{
         System.out.println("Warning: A state with name"+name+"already exists");
       }
@@ -73,29 +74,42 @@ public class NFA implements NFAInterface{
     }
 
     @Override
-    public void addTransition(String fromState, char onSymb, String toState) {
-        if(!sigma.contains(onSymb)) {
-			sigma.add(onSymb);
-		}
-		Iterator<NFAState> toItr = statesSet.iterator();
-		Iterator<NFAState> fromItr = statesSet.iterator();
-		NFAState fromS = fromItr.next();
-		while(fromItr.hasNext() 
-				&& !fromS.getNameNFA().equals(fromState)) {
-			fromS = fromItr.next();
-		}
+    // public void addTransition(String fromState, char onSymb, String toState) {
+    //     if(!sigma.contains(onSymb)) {
+	// 		sigma.add(onSymb);
+	// 	}
+	// 	Iterator<NFAState> toItr = statesSet.iterator();
+	// 	Iterator<NFAState> fromItr = statesSet.iterator();
+	// 	NFAState fromS = fromItr.next();
+	// 	while(fromItr.hasNext() 
+	// 			&& !fromS.getNameNFA().equals(fromState)) {
+	// 		fromS = fromItr.next();
+	// 	}
 
-		NFAState toS = toItr.next();
-		while(toItr.hasNext() 
-				&& !toS.getNameNFA().equals(toState)) {
-			toS = toItr.next();
+	// 	NFAState toS = toItr.next();
+	// 	while(toItr.hasNext() 
+	// 			&& !toS.getNameNFA().equals(toState)) {
+	// 		toS = toItr.next();
+	// 	}
+	// 	fromS.addTransition(onSymb, toS);
+		
+    //     if(!sigma.contains(onSymb) && onSymb != 'e'){
+    //         sigma.add(onSymb);
+    //     }
+	// }  
+	//@Override
+	public void addTransition(String fromState, char onSymb, String toState) {
+		NFAState fromS = checkIfExists(fromState);
+		NFAState toS = checkIfExists(toState);
+		if(fromS == null || toS == null){
+			System.exit(2);
 		}
 		fromS.addTransition(onSymb, toS);
+		if(!sigma.contains(onSymb) && onSymb != 'e'){
+				sigma.add(onSymb);
+		}
 		
-        if(!sigma.contains(onSymb) && onSymb != 'e'){
-            sigma.add(onSymb);
-        }
-	}  
+	}
     
 	/**
 	 * Construct the textual representation of the DFA, for example
@@ -212,73 +226,106 @@ public class NFA implements NFAInterface{
      return sigma;
     }
 
-    @Override
-    public DFA getDFA() {
-        // Must implement the breadth first search algorithm.
+	public DFA getDFA(){
+		DFA d = new DFA();
+
+		Set<Set<NFAState>> statesAdded = new HashSet<Set<NFAState>>();
+		d.addStartState(eClosure(startState).toString());
 		Queue<Set<NFAState>> workQueue = new LinkedList<Set<NFAState>>();
-		DFA d = new DFA(); // Step 1. https://www.javatpoint.com/automata-conversion-from-nfa-to-dfa
 		workQueue.add(eClosure(startState));
+		String startName = eClosure(startState).toString();
+		d.addStartState(startName);
+		if(checkIfFinal(eClosure(startState))){
+			d.addFinalState(startName);
+		}
 
-		while (!workQueue.isEmpty()) {
-			Set<NFAState> currentNode = workQueue.poll(); // current workItem.
-			boolean isFinalState = false;
+		statesAdded.add(eClosure(startState));
 
-			for (NFAState n : currentNode) {
-				if (n.isFinal()) {
-					isFinalState = true;
-				}
-			}
-
-			if (d.getStartState() == null && !isFinalState) {
-				d.addStartState(currentNode.toString());
-			} else if (d.getStartState() == null && isFinalState) {
-				d.addFinalState(currentNode.toString());
-				d.addStartState(currentNode.toString());
-			}
-
-			for (Character symb : getABC()) {
-				Set<NFAState> setOfStateForSymb = new HashSet<NFAState>();
-				for (NFAState v : currentNode) {
-					if (v.getTransition(symb) != null) {
-						for (NFAState t : v.getTransition(symb)) {
-							setOfStateForSymb.addAll(eClosure(t));
-						}
-					}
-				}
-
-				boolean dfaHasState = false;
-
-				for (State s : d.getStates()) {
-					if (s.getName().equals(setOfStateForSymb.toString())) {
-						dfaHasState = true;
-					}
-				}
-				if (setOfStateForSymb.toString() == "[]") {
-					if (!dfaHasState) {
-						d.addState("[]");
-						workQueue.add(setOfStateForSymb);
-					}
-					d.addTransition(currentNode.toString(), symb, "[]");
-				} else if (!dfaHasState) {
-					boolean isFinal = false;
-					for (NFAState ns : setOfStateForSymb) {
-						if (ns.isFinal()) {
-							isFinal = true;
-						}
-					}
-					if (isFinal) {
-						workQueue.add(setOfStateForSymb);
-						d.addFinalState(setOfStateForSymb.toString());
-					} else {
-						workQueue.add(setOfStateForSymb);
-						d.addState(setOfStateForSymb.toString());
-					}
-				}
-				d.addTransition(currentNode.toString(), symb, setOfStateForSymb.toString());
+		while(workQueue.peek() != null){//while there is stuff still in the que
+			Set<NFAState> thing = workQueue.poll();
+			for(Character onSymb : sigma){
+				Set<NFAState> to = getToState(thing, onSymb);
 			}
 		}
-		return d;
+
 	}
+
+	public boolean checkIfFinal(Set<NFAState> stuff){
+		for (NFAState n : stuff) {
+			if (n.isFinal()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+    // @Override
+    // public DFA getDFA() {
+    //     // Must implement the breadth first search algorithm.
+	// 	Queue<Set<NFAState>> workQueue = new LinkedList<Set<NFAState>>();
+	// 	DFA d = new DFA(); // Step 1. https://www.javatpoint.com/automata-conversion-from-nfa-to-dfa
+	// 	workQueue.add(eClosure(startState));
+
+	// 	while (!workQueue.isEmpty()) {
+	// 		Set<NFAState> currentNode = workQueue.poll(); // current workItem.
+	// 		boolean isFinalState = false;
+
+	// 		for (NFAState n : currentNode) {
+	// 			if (n.isFinal()) {
+	// 				isFinalState = true;
+	// 			}
+	// 		}
+
+	// 		if (d.getStartState() == null && !isFinalState) {
+	// 			d.addStartState(currentNode.toString());
+	// 		} else if (d.getStartState() == null && isFinalState) {
+	// 			d.addFinalState(currentNode.toString());
+	// 			d.addStartState(currentNode.toString());
+	// 		}
+
+	// 		for (Character symb : getABC()) {
+	// 			Set<NFAState> setOfStateForSymb = new HashSet<NFAState>();
+	// 			for (NFAState v : currentNode) {
+	// 				if (v.getTransition(symb) != null) {
+	// 					for (NFAState t : v.getTransition(symb)) {
+	// 						setOfStateForSymb.addAll(eClosure(t));
+	// 					}
+	// 				}
+	// 			}
+
+	// 			boolean dfaHasState = false;
+
+	// 			for (State s : d.getStates()) {
+	// 				if (s.getName().equals(setOfStateForSymb.toString())) {
+	// 					dfaHasState = true;
+	// 				}
+	// 			}
+	// 			if (setOfStateForSymb.toString() == "[]") {
+	// 				if (!dfaHasState) {
+	// 					d.addState("[]");
+	// 					workQueue.add(setOfStateForSymb);
+	// 				}
+	// 				d.addTransition(currentNode.toString(), symb, "[]");
+	// 			} else if (!dfaHasState) {
+	// 				boolean isFinal = false;
+	// 				for (NFAState ns : setOfStateForSymb) {
+	// 					if (ns.isFinal()) {
+	// 						isFinal = true;
+	// 					}
+	// 				}
+	// 				if (isFinal) {
+	// 					workQueue.add(setOfStateForSymb);
+	// 					d.addFinalState(setOfStateForSymb.toString());
+	// 				} else {
+	// 					workQueue.add(setOfStateForSymb);
+	// 					d.addState(setOfStateForSymb.toString());
+	// 				}
+	// 			}
+	// 			d.addTransition(currentNode.toString(), symb, setOfStateForSymb.toString());
+	// 		}
+	// 	}
+	// 	return d;
+	// }
 	
 
     @Override
