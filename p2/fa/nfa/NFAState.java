@@ -5,11 +5,13 @@ import java.util.HashSet;
 import java.util.Set;
 //import java.util.LinkedHashSet;
 
+//@author andrew gerber
+
 public class NFAState extends fa.State {
 
 
     //private vcariables
-    private boolean isFinal;//to hold if final
+    private boolean finalBool;//to hold if final
 
     //Map of transitions on a character fir the given state
     private HashMap<Character , Set<NFAState>> transitionMap;//based on fa.State and DFAState
@@ -22,7 +24,7 @@ public class NFAState extends fa.State {
     public NFAState(String inputName){
         this.name = inputName;
         transitionMap = new HashMap<Character, Set<NFAState>>();
-        isFinal = false;
+        finalBool = false;
     }
     /*Contrsuctor
     * input: string name
@@ -32,11 +34,11 @@ public class NFAState extends fa.State {
     public NFAState(String inputname, boolean bool){
         this.name = inputname;
         transitionMap = new HashMap<Character, Set<NFAState>>();
-        isFinal = bool;
+        finalBool = bool;
     }
 
     public boolean isFinal(){
-        return this.isFinal();
+        return this.finalBool;
     }
     /**
 	 * Method to add a transition to the DFA
@@ -80,6 +82,15 @@ public class NFAState extends fa.State {
     }
     //returns transtion from current state given on symbol
     public Set<NFAState> getTrans(char onSymb){
+        return transitionMap.get(onSymb);
+    }
+    //returns transtion from current state given on symbol
+    public Set<NFAState> getTransition(char onSymb){
+        Set<NFAState> tmp = transitionMap.get(onSymb);
+        if(tmp == null){
+            return new HashSet<NFAState>();
+        }
+
         return transitionMap.get(onSymb);
     }
 

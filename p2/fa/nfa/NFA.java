@@ -18,9 +18,10 @@ public class NFA implements NFAInterface{
     private LinkedHashSet<NFAState> statesSet; //holds all the states of the NFA	
 	private HashSet<Character> sigma; //includes all letters used
     
-    public NFA(){
-		statesSet = new LinkedHashSet<>();
-		eClosure = new LinkedHashSet<>();
+	public NFA(){
+        finalStates = new LinkedHashSet<>();
+        statesSet = new LinkedHashSet<>();
+        eClosure = new LinkedHashSet<>();
         sigma = new HashSet<>();
     }
   
@@ -61,8 +62,7 @@ public class NFA implements NFAInterface{
       NFAState f = checkIfExists(name);
       if(f == null){
           f = new NFAState(name,true);
-		  
-          finalStates.add(f);
+          //finalStates.add(f);
           statesSet.add(f);
       }else{
         System.out.println("Warning: A state with name"+name+"already exists");
@@ -239,8 +239,8 @@ public class NFA implements NFAInterface{
 			for (Character symb : getABC()) {
 				Set<NFAState> setOfStateForSymb = new HashSet<NFAState>();
 				for (NFAState v : currentNode) {
-					if (v.getTrans(symb) != null) {
-						for (NFAState t : v.getTrans(symb)) {
+					if (v.getTransition(symb) != null) {
+						for (NFAState t : v.getTransition(symb)) {
 							setOfStateForSymb.addAll(eClosure(t));
 						}
 					}
@@ -283,13 +283,14 @@ public class NFA implements NFAInterface{
 
     @Override
     public Set<NFAState> getToState(NFAState from, char onSymb) {
-        return from.getTrans(onSymb);
+        return from.getTransition(onSymb);
     }
 
     @Override
     public Set<NFAState> eClosure(NFAState s) {
-          if(!s.getTrans('e').equals(new HashSet<NFAState>())) {
-        	for (NFAState x : s.getTrans('e')) {
+          if(!s.getTransition('e').equals
+		  (new HashSet<NFAState>())) {
+        	for (NFAState x : s.getTransition('e')) {
                 if (!this.eClosure.contains(x)) {
                     this.eClosure.add(x);
                     eClosure(x);
@@ -300,6 +301,8 @@ public class NFA implements NFAInterface{
         }
 		return this.eClosure;
     }
+
+	
     
 /**
 	 * Check if a state with such name already exists
