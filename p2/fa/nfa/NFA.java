@@ -19,7 +19,8 @@ public class NFA implements NFAInterface{
 	private HashSet<Character> sigma; //includes all letters used
     
     public NFA(){
-		statesSet = new LinkedHashSet<>();
+		finalStates = new LinkedHashSet<>();
+        statesSet = new LinkedHashSet<>();
 		eClosure = new LinkedHashSet<>();
         sigma = new HashSet<>();
     }
