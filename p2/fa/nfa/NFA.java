@@ -3,6 +3,8 @@ package fa.nfa;
 import java.util.Set;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.HashSet;
 import java.util.Iterator;
 import fa.State;
@@ -211,9 +213,72 @@ public class NFA implements NFAInterface{
 
     @Override
     public DFA getDFA() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+        // Must implement the breadth first search algorithm.
+		Queue<Set<NFAState>> workQueue = new LinkedList<Set<NFAState>>();
+		DFA d = new DFA(); // Step 1. https://www.javatpoint.com/automata-conversion-from-nfa-to-dfa
+		workQueue.add(eClosure(startState));
+
+		while (!workQueue.isEmpty()) {
+			Set<NFAState> currentNode = workQueue.poll(); // current workItem.
+			boolean isFinalState = false;
+
+			for (NFAState n : currentNode) {
+				if (n.isFinal()) {
+					isFinalState = true;
+				}
+			}
+
+			if (d.getStartState() == null && !isFinalState) {
+				d.addStartState(currentNode.toString());
+			} else if (d.getStartState() == null && isFinalState) {
+				d.addFinalState(currentNode.toString());
+				d.addStartState(currentNode.toString());
+			}
+
+			for (Character symb : getABC()) {
+				Set<NFAState> setOfStateForSymb = new HashSet<NFAState>();
+				for (NFAState v : currentNode) {
+					if (v.getTrans(symb) != null) {
+						for (NFAState t : v.getTrans(symb)) {
+							setOfStateForSymb.addAll(eClosure(t));
+						}
+					}
+				}
+
+				boolean dfaHasState = false;
+
+				for (State s : d.getStates()) {
+					if (s.getName().equals(setOfStateForSymb.toString())) {
+						dfaHasState = true;
+					}
+				}
+				if (setOfStateForSymb.toString() == "[]") {
+					if (!dfaHasState) {
+						d.addState("[]");
+						workQueue.add(setOfStateForSymb);
+					}
+					d.addTransition(currentNode.toString(), symb, "[]");
+				} else if (!dfaHasState) {
+					boolean isFinal = false;
+					for (NFAState ns : setOfStateForSymb) {
+						if (ns.isFinal()) {
+							isFinal = true;
+						}
+					}
+					if (isFinal) {
+						workQueue.add(setOfStateForSymb);
+						d.addFinalState(setOfStateForSymb.toString());
+					} else {
+						workQueue.add(setOfStateForSymb);
+						d.addState(setOfStateForSymb.toString());
+					}
+				}
+				d.addTransition(currentNode.toString(), symb, setOfStateForSymb.toString());
+			}
+		}
+		return d;
+	}
+	
 
     @Override
     public Set<NFAState> getToState(NFAState from, char onSymb) {
