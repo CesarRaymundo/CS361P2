@@ -3,7 +3,7 @@ package fa.nfa;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.LinkedHashSet;
+//import java.util.LinkedHashSet;
 
 public class NFAState extends fa.State {
 

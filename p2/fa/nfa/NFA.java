@@ -1,7 +1,7 @@
 package fa.nfa;
 
 import java.util.Set;
-import java.util.LinkedHashMap;
+//import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -60,7 +60,8 @@ public class NFA implements NFAInterface{
     public void addFinalState(String name) {
       NFAState f = checkIfExists(name);
       if(f == null){
-          f = new NFAState(name);
+          f = new NFAState(name,true);
+		  
           finalStates.add(f);
           statesSet.add(f);
       }else{
