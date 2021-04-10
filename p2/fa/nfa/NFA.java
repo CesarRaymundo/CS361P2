@@ -335,19 +335,26 @@ public class NFA implements NFAInterface{
 
     @Override
     public Set<NFAState> eClosure(NFAState s) {
-          if(!s.getTransition('e').equals
-		  (new HashSet<NFAState>())) {
-        	for (NFAState x : s.getTransition('e')) {
-                if (!this.eClosure.contains(x)) {
-                    this.eClosure.add(x);
-                    eClosure(x);
-                }
-            }
-        } else {
-        	this.eClosure.add(s);
-        }
-		return this.eClosure;
+      HashSet<NFAState> eStatesSet = new HashSet<>();
+
+	  return DFS(s,eStatesSet);
     }
+
+	private HashSet<NFAState> DFS(NFAState s, HashSet<NFAState> list){
+		list.add(s);
+		
+		HashSet<NFAState> eStatesSet = s.getTo('e');
+		if (eStatesSet != null) {
+			//iterate through out eStates 
+			for (NFAState iterateEstates : eStatesSet) {
+				//making sure the state is not already in the list 
+				if(!(list.contains(iterateEstates))) 
+					//calling recursively to process all the states
+				DFS(iterateEstates, list);
+				}
+		}
+		return list;
+	}
 
 	
     
