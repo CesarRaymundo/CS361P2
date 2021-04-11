@@ -175,11 +175,12 @@ public class NFA implements NFAInterface {
 	}
 
 	/**
+	 * Depth- first search algorithm that adds the epsilion enclosure
+	 * to eStatesSet
 	 * 
-	 * 
-	 * @param s 
-	 * @param list
-	 * @return
+	 * @param s - the state with epsilion enClosure
+	 * @param list - contains the list with the states
+	 * @return the states with episilon enClosure
 	 */
 	private HashSet<NFAState> DFS(NFAState s, HashSet<NFAState> list) {
 		//Adding the state to a list
