@@ -3,96 +3,92 @@ package fa.nfa;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-//import java.util.LinkedHashSet;
 
-//@author andrew gerber
-
+/**
+ * This class implements a NFAAState, which holds each transition for a state,
+ * as well as each NFAState's name.
+ * 
+ * @author Andrew Gerber & Cesar Raymundo
+ *
+ */
 public class NFAState extends fa.State {
 
+    // private variables
+    private boolean finalBool;// to hold if final
 
-    //private vcariables
-    private boolean finalBool;//to hold if final
+    // Map of transitions on a character fir the given state
+    private HashMap<Character, HashSet<NFAState>> transitionMap;// based on fa.State and DFAState
 
-    //Map of transitions on a character fir the given state
-    private HashMap<Character , HashSet<NFAState>> transitionMap;//based on fa.State and DFAState
-
-
-
-/*Contrsuctor
-* input: string name
-*/
-    public NFAState(String inputName){
+    /**
+     * Constructor
+     * 
+     * @param inputName - name of the state
+     */
+    public NFAState(String inputName) {
         this.name = inputName;
         transitionMap = new HashMap<Character, HashSet<NFAState>>();
         finalBool = false;
     }
-    /*Contrsuctor
-    * input: string name
-    * input boolean
-    * Use: if needed to maike a state that you know is final rather than change to final
-    */
-    public NFAState(String inputname, boolean bool){
+
+    /**
+     * Contrsuctor
+     *
+     * @param inputName - name of state
+     * @param bool      - if needed to maike a state that you know is final rather
+     *                  than change to final
+     */
+    public NFAState(String inputname, boolean bool) {
         this.name = inputname;
         transitionMap = new HashMap<Character, HashSet<NFAState>>();
         finalBool = bool;
     }
 
-    public boolean isFinal(){
+    public boolean isFinal() {
         return this.finalBool;
     }
-    /**
-	 * Method to add a transition to the DFA
-	 * @param onSymb - symbol need to make transition to toState
-	 * @param toState - state that will be transitioned to
-	 */
-    //BASED ON DFA
-    public void addTransition(char onSymb, NFAState toState){
-       if(!transitionMap.containsKey(onSymb)){
-           transitionMap.put(onSymb, new HashSet<NFAState>());
-       }
 
-       transitionMap.get(onSymb).add(toState);
-        
-    }
     /**
-	 * Method to add a transition to the DFA
-     *  IF there the transiton doesnt exist make transition else make branch transiton
-	 * @param onSymb - symbol need to make transition to toState
-	 * @param toState - state that will be transitioned to
-	 */
-    
-    // public void addTransition(char onSymb, NFAState toState){
-        
-    //     if(transitionMap.get(onSymb) == null){//conditon for it to be empty
-    //         //make single hashset
-    //         LinkedHashSet<NFAState> firstTrans = new LinkedHashSet<NFAState>();
-            
-    //         firstTrans.add(toState);
-    //         transitionMap.put(onSymb, firstTrans);
-    //     }
-    //     else{//conditon for it to not empty
-    //         //make branch linked hash
-    //         LinkedHashSet<NFAState> multiTrans = new LinkedHashSet<NFAState>();
-    //         multiTrans.add(toState);
-    //         transitionMap.put(onSymb, multiTrans);
-    //     }
-    // }
-    public String getNameNFA(){
+     * Method to add a transition to the NFA
+     * 
+     * @param onSymb  - symbol need to make transition to toState
+     * @param toState - state that will be transitioned to
+     */
+    // BASED ON DFA
+    public void addTransition(char onSymb, NFAState toState) {
+        if (transitionMap.containsKey(onSymb) == false) {
+            HashSet<NFAState> temp = new HashSet<NFAState>();
+            transitionMap.put(onSymb, temp);
+        }
+        transitionMap.get(onSymb).add(toState);
+
+    }
+
+    public String getNameNFA() {
         return this.name;
     }
-    //returns transtion from current state given on symbol
-    public HashMap<Character , HashSet<NFAState>> getTrans(){
-        return transitionMap;
+
+    /**
+     * Returns the hashmap containing the transitions.
+     * 
+     * @return
+     */
+    public Set<NFAState> getTrans(char onSymb) {
+        return transitionMap.get(onSymb);
     }
-    //returns transtion from current state given on symbol
-    public Set<NFAState> getTransition(char onSymb){
+
+    /**
+     * Retrieves the current state that transitions to on the given symbol
+     * 
+     * @param symb - the alphabet symbol
+     * @return the new state
+     */
+    public Set<NFAState> getTransition(char onSymb) {
         Set<NFAState> tmp = transitionMap.get(onSymb);
-        if(tmp == null){
+        if (tmp == null) {
             return new HashSet<NFAState>();
         }
 
         return transitionMap.get(onSymb);
     }
 
-    
 }
