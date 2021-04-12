@@ -36,6 +36,7 @@ No extra credit in this project.
 
 ## Sources used
 
+https://cs.stackexchange.com/questions/37049/applying-dfs-algorithm-to-a-transition-system-to-find-reachable-states
 https://www.cs.odu.edu/~zeil/cs390/latest/Public/nfa-jflap/index.html
 https://www.geeksforgeeks.org/c-program-to-simulate-nondeterministic-finite-automata-nfa/
 https://www.javatpoint.com/automata-conversion-from-nfa-to-dfa
