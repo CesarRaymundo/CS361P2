@@ -22,7 +22,9 @@ public class NFA implements NFAInterface {
 		statesSet = new LinkedHashSet<>();
 		sigma = new HashSet<>();
 	}
-
+	/**
+	 * adds a starting state if it does not already exisit
+	 */
 	@Override
 	public void addStartState(String name) {
 		NFAState s = checkIfExists(name);
@@ -30,12 +32,14 @@ public class NFA implements NFAInterface {
 			s = new NFAState(name);
 			statesSet.add(s);
 		} else {
-			System.out.println("Warning: A state with name" + name + "already exists");
+			System.out.println(name + "Do already be a thing doe");
 		}
 		startState = s;
 
 	}
-
+	/**
+	 * adds a state if it does not already exisit
+	 */
 	@Override
 	public void addState(String name) {
 		NFAState s = checkIfExists(name);
@@ -43,11 +47,13 @@ public class NFA implements NFAInterface {
 			s = new NFAState(name);
 			statesSet.add(s);
 		} else {
-			System.out.println("Warning: A state with name" + name + "already exists");
+			System.out.println(name + "Do already be a thing doe");
 		}
 
 	}
-
+	/**
+	 * adds a final state if it does not already exisit
+	 */
 	@Override
 	public void addFinalState(String name) {
 		NFAState f = checkIfExists(name);
@@ -56,10 +62,13 @@ public class NFA implements NFAInterface {
 			finalStates.add(f);
 			statesSet.add(f);
 		} else {
-			System.out.println("Warning: A state with name" + name + "already exists");
+			System.out.println(name + "Do already be a thing doe");
 		}
 	}
-
+/**
+	 * add a transiiton fromt he from state to the to state with the onsymb
+	 * based on dfa
+	 */
 	@Override
 	public void addTransition(String fromState, char onSymb, String toState) {
 		NFAState fromS = checkIfExists(fromState);
@@ -73,100 +82,125 @@ public class NFA implements NFAInterface {
 		}
 
 	}
-
+	/**
+	 * returns all the states used in the nfa
+	 */
 	@Override
 	public Set<? extends State> getStates() {
 		return statesSet;
 	}
-
+	/**
+	 * returns the final states as a set
+	 */
 	@Override
 	public Set<? extends State> getFinalStates() {
 		return finalStates;
 	}
-
+/**
+	 * returns the the starting state
+	 * based on dfa
+	 */
 	@Override
 	public State getStartState() {
 		return startState;
 	}
 
 	@Override
+	/**
+	 * returns the alphabet used in the nfa
+	 * based on dfa
+	 */
 	public Set<Character> getABC() {
 		return sigma;
 	}
 
+	/**
+	 * 
+	 * @return equivalent DFA
+	 */
 	@Override
 	public DFA getDFA() {
-		// Must implement the breadth first search algorithm.
-		Queue<Set<NFAState>> workQueue = new LinkedList<Set<NFAState>>();
-		DFA d = new DFA(); // Step 1. https://www.javatpoint.com/automata-conversion-from-nfa-to-dfa
-		workQueue.add(eClosure(startState));
+		
+		Queue<Set<NFAState>> stack = new LinkedList<Set<NFAState>>();
+		DFA convertedNFA = new DFA(); 
+		stack.add(eClosure(startState));
 
-		while (!workQueue.isEmpty()) {
-			Set<NFAState> currentNode = workQueue.poll(); // current workItem.
+		while (!stack.isEmpty()) {
+			Set<NFAState> currentState = stack.poll();
 			boolean isFinalState = false;
 
-			for (NFAState n : currentNode) {
-				if (n.isFinal()) {
+			for (NFAState tmp : currentState) {
+				if (tmp.isFinal()) {
 					isFinalState = true;
 				}
 			}
 
-			if (d.getStartState() == null && !isFinalState) {
-				d.addStartState(currentNode.toString());
-			} else if (d.getStartState() == null && isFinalState) {
-				d.addFinalState(currentNode.toString());
-				d.addStartState(currentNode.toString());
+			if (convertedNFA.getStartState() == null && !isFinalState) {
+				convertedNFA.addStartState(currentState.toString());
+			} else if (convertedNFA.getStartState() == null && isFinalState) {
+				convertedNFA.addFinalState(currentState.toString());
+				convertedNFA.addStartState(currentState.toString());
 			}
 
-			for (Character symb : getABC()) {
-				Set<NFAState> setOfStateForSymb = new HashSet<NFAState>();
-				for (NFAState v : currentNode) {
-					if (v.getTransition(symb) != null) {
-						for (NFAState t : v.getTransition(symb)) {
-							setOfStateForSymb.addAll(eClosure(t));
+			for (Character onSymb : getABC()) {
+				Set<NFAState> toSymbolds = new HashSet<NFAState>();
+				for (NFAState node : currentState) {
+					if (node.getTransition(onSymb) != null) {
+						for (NFAState tmp : node.getTransition(onSymb)) {
+							toSymbolds.addAll(eClosure(tmp));
 						}
 					}
 				}
 
-				boolean dfaHasState = false;
+				boolean dfaHasStatebool = false;
 
-				for (State s : d.getStates()) {
-					if (s.getName().equals(setOfStateForSymb.toString())) {
-						dfaHasState = true;
+				for (State states : convertedNFA.getStates()) {
+					if (states.getName().equals(toSymbolds.toString())) {
+						dfaHasStatebool = true;
 					}
 				}
-				if (setOfStateForSymb.toString() == "[]") {
-					if (!dfaHasState) {
-						d.addState("[]");
-						workQueue.add(setOfStateForSymb);
+				if (toSymbolds.toString() == "[]") {
+					if (!dfaHasStatebool) {
+						convertedNFA.addState("[]");
+						stack.add(toSymbolds);
 					}
-					d.addTransition(currentNode.toString(), symb, "[]");
-				} else if (!dfaHasState) {
-					boolean isFinal = false;
-					for (NFAState ns : setOfStateForSymb) {
-						if (ns.isFinal()) {
-							isFinal = true;
+					convertedNFA.addTransition(currentState.toString(), onSymb, "[]");
+				} else if (!dfaHasStatebool) {
+					boolean ifFinal = false;
+					for (NFAState testFinal : toSymbolds) {
+						if (testFinal.isFinal()) {
+							ifFinal = true;
 						}
 					}
-					if (isFinal) {
-						workQueue.add(setOfStateForSymb);
-						d.addFinalState(setOfStateForSymb.toString());
+					if (ifFinal) {
+						stack.add(toSymbolds);
+						convertedNFA.addFinalState(toSymbolds.toString());
 					} else {
-						workQueue.add(setOfStateForSymb);
-						d.addState(setOfStateForSymb.toString());
+						stack.add(toSymbolds);
+						convertedNFA.addState(toSymbolds.toString());
 					}
 				}
-				d.addTransition(currentNode.toString(), symb, setOfStateForSymb.toString());
+				convertedNFA.addTransition(currentState.toString(), onSymb, toSymbolds.toString());
 			}
 		}
-		return d;
+		return convertedNFA;
 	}
-
+/**
+	 * Return delta entries
+	 * @param from - the source state
+	 * @param onSymb - the label of the transition
+	 * @return a set of sink states
+	 */
 	@Override
 	public Set<NFAState> getToState(NFAState from, char onSymb) {
 		return from.getTransition(onSymb);
 	}
-
+/**
+	 * Traverses all epsilon transitions and determine
+	 * what states can be reached from s through e
+	 * @param s
+	 * @return set of states that can be reached from s on epsilon trans.
+	 */
 	@Override
 	public Set<NFAState> eClosure(NFAState s) {
 		//Creating new set for empty transitions
