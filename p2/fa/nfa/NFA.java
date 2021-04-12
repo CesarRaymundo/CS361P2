@@ -65,7 +65,7 @@ public class NFA implements NFAInterface {
 			System.out.println(name + "Do already be a thing doe");
 		}
 	}
-/**
+	/**
 	 * add a transiiton fromt he from state to the to state with the onsymb
 	 * based on dfa
 	 */
@@ -96,7 +96,7 @@ public class NFA implements NFAInterface {
 	public Set<? extends State> getFinalStates() {
 		return finalStates;
 	}
-/**
+	/**
 	 * returns the the starting state
 	 * based on dfa
 	 */
@@ -185,7 +185,7 @@ public class NFA implements NFAInterface {
 		}
 		return convertedNFA;
 	}
-/**
+	/**
 	 * Return delta entries
 	 * @param from - the source state
 	 * @param onSymb - the label of the transition
@@ -195,7 +195,7 @@ public class NFA implements NFAInterface {
 	public Set<NFAState> getToState(NFAState from, char onSymb) {
 		return from.getTransition(onSymb);
 	}
-/**
+	/**
 	 * Traverses all epsilon transitions and determine
 	 * what states can be reached from s through e
 	 * @param s
@@ -239,7 +239,7 @@ public class NFA implements NFAInterface {
 	 * This method is taken from DFA class provided
 	 * 
 	 * @param name
-	 * @return null if no state exist, or DFAState object otherwise.
+	 * @return null if no state exist, or NFAState object otherwise.
 	 */
 	private NFAState checkIfExists(String name) {
 		NFAState ret = null;
