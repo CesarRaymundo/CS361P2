@@ -124,41 +124,31 @@ public class NFA implements NFAInterface {
 		Queue<Set<NFAState>> stack = new LinkedList<Set<NFAState>>();
 		DFA convertedNFA = new DFA(); 
 		stack.add(eClosure(startState));
-
 		while (!stack.isEmpty()) {
 			Set<NFAState> currentState = stack.poll();
 			boolean isFinalState = false;
-
 			for (NFAState tmp : currentState) {
 				if (tmp.isFinal()) {
 					isFinalState = true;
-				}
-			}
-
+				}}
 			if (convertedNFA.getStartState() == null && !isFinalState) {
 				convertedNFA.addStartState(currentState.toString());
 			} else if (convertedNFA.getStartState() == null && isFinalState) {
 				convertedNFA.addFinalState(currentState.toString());
 				convertedNFA.addStartState(currentState.toString());
 			}
-
 			for (Character onSymb : getABC()) {
 				Set<NFAState> toSymbolds = new HashSet<NFAState>();
 				for (NFAState node : currentState) {
 					if (node.getTransition(onSymb) != null) {
 						for (NFAState tmp : node.getTransition(onSymb)) {
 							toSymbolds.addAll(eClosure(tmp));
-						}
-					}
-				}
-
+						}}}
 				boolean dfaHasStatebool = false;
-
 				for (State states : convertedNFA.getStates()) {
 					if (states.getName().equals(toSymbolds.toString())) {
 						dfaHasStatebool = true;
-					}
-				}
+					}}
 				if (toSymbolds.toString() == "[]") {
 					if (!dfaHasStatebool) {
 						convertedNFA.addState("[]");
@@ -170,19 +160,16 @@ public class NFA implements NFAInterface {
 					for (NFAState testFinal : toSymbolds) {
 						if (testFinal.isFinal()) {
 							ifFinal = true;
-						}
-					}
+						}}
 					if (ifFinal) {
 						stack.add(toSymbolds);
 						convertedNFA.addFinalState(toSymbolds.toString());
 					} else {
 						stack.add(toSymbolds);
 						convertedNFA.addState(toSymbolds.toString());
-					}
-				}
-				convertedNFA.addTransition(currentState.toString(), onSymb, toSymbolds.toString());
-			}
-		}
+					}}
+			convertedNFA.addTransition(currentState.toString(), onSymb, toSymbolds.toString());
+			}}
 		return convertedNFA;
 	}
 	/**
